@@ -7,6 +7,8 @@
     "src/preload/*.d.ts"
   ],
   "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "composite": true,
     "baseUrl": ".",
     "paths": {
