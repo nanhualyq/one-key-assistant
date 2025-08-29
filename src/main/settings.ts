@@ -1,13 +1,19 @@
 import Store from 'electron-store'
 
+type Action = {
+    name: string,
+    shortcut?: string,
+    target: string
+}
+
 type StoreType = {
-    plugins: string[]
+    actions: Action[]
 }
 
 const store = new Store<StoreType>({
     name: process.env.NODE_ENV === 'development' ? 'config.dev' : 'config'
 })
 
-store.set('plugins', ['plugin1', 'plugin2'])
+store.set('actions', [{ name: 'plugin1' }, { name: 'plugin2' }])
 
 export default store
