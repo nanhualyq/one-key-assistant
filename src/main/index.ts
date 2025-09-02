@@ -1,11 +1,12 @@
-import { app, shell, BrowserWindow, ipcMain, globalShortcut } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import popupWindow from './popupWindow.js'
 import './tray'
 import store from './settings.js'
 import { fileURLToPath } from 'url'
+import { installExtension, VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import './globalShortcuts.js'
 
 console.log(store.path);
 
@@ -55,6 +56,11 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  if (process.env.NODE_ENV === 'development') {
+    installExtension(VUEJS_DEVTOOLS)
+      .then((ext) => console.log(`Added Extension:  ${ext.name}`))
+      .catch((err) => console.log('An error occurred: ', err))
+  }
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -64,11 +70,6 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
-  globalShortcut.register('Meta+F1', popupWindow)
 
   createWindow()
 
@@ -86,12 +87,6 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
-})
-
-app.on('will-quit', () => {
-  console.log('will-quit');
-  // Unregister all shortcuts.
-  globalShortcut.unregisterAll()
 })
 
 // In this file you can include the rest of your app's specific main process
