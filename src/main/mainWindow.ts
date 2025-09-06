@@ -33,6 +33,8 @@ export function setWindowUrl(window: BrowserWindow, hash: string) {
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
         window.loadURL(process.env['ELECTRON_RENDERER_URL'] + `#/${hash}`)
     } else {
-        window.loadFile(fileURLToPath(new URL('../renderer/index.html' + `#/${hash}`, import.meta.url)))
+        window.loadURL(
+            `file://${fileURLToPath(new URL('../renderer/index.html', import.meta.url))}#/${hash}`
+        )
     }
 }
