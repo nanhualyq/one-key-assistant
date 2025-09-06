@@ -1,56 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
-import './tray'
-import store from './settings.js'
-import { fileURLToPath } from 'url'
+import { app, BrowserWindow } from 'electron'
+import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { installExtension, VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import './tray'
 import './globalShortcuts.js'
-
-console.log(store.path);
-
-
-function createWindow(): void {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
-    show: false,
-    autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: fileURLToPath(new URL('../preload/index.mjs', import.meta.url)),
-      sandbox: false
-    }
-  })
-
-  mainWindow.on('ready-to-show', () => {
-    // mainWindow.show()
-  })
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
-
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
-
-  ipcMain.on('tray-click', () => {
-    if (mainWindow.isVisible()) {
-      mainWindow.hide()
-    } else {
-      mainWindow.show()
-      mainWindow.focus()
-    }
-  })
-}
+import { createWindow } from './mainWindow.js'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

@@ -1,13 +1,14 @@
-import { createMemoryHistory, createRouter } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import ActionPage from './pages/ActionPage.vue'
+import GenimiPage from './pages/GenimiPage.vue'
 
 const routes = [
     { path: '/', component: ActionPage },
-    // { path: '/about', component: AboutView },
+    { path: '/gemini', component: GenimiPage },
 ]
 
 const router = createRouter({
-    history: createMemoryHistory(),
+    history: createWebHashHistory(),
     routes,
 })
 

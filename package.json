@@ -24,8 +24,10 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@google/genai": "^1.16.0",
     "electron-store": "^10.1.0",
     "electron-updater": "^6.3.9",
+    "marked": "^16.2.1",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
