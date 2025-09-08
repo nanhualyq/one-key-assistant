@@ -1,9 +1,9 @@
 import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { installExtension, VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+import { createWindow } from './mainWindow.js'
 import './tray'
 import './globalShortcuts.js'
-import { createWindow } from './mainWindow.js'
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
