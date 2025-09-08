@@ -11,7 +11,16 @@ const store = new Store<StoreType>({
 })
 
 if (!store.has('gemini')) {
-    store.set('gemini.apiKey', '')
+    store.set('gemini', {
+        apiKey: '',
+        quickChatList: [{
+            name: 'Default',
+            model: 'gemini-2.5-flash',
+            systemInstruction: 'You are a helpful assistant',
+            isSearch: false,
+            isThinking: false
+        }]
+    })
 }
 
 app.whenReady().then(() => {

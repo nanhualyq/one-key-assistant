@@ -3,17 +3,21 @@ import { GoogleGenAI } from '@google/genai';
 import { marked } from 'marked';
 import { computed, onMounted, reactive, ref } from 'vue';
 
-let config:GeminiConfig
+let config: GeminiConfig
 
 onMounted(async () => {
     config = await window.electron.ipcRenderer.invoke('electron-store', 'get', 'gemini') as GeminiConfig
+    config = reactive(config)
+    resetInputForm()
 })
 
+const prompt = ref('')
+
 const getInitialForm = () => ({
-    model: 'gemini-2.5-flash',
-    prompt: '',
+    model: '',
+    isThinking: false,
     isSearch: false,
-    isThinking: false
+    systemInstruction: ''
 });
 const inputForm = reactive(getInitialForm())
 const response = ref('')
@@ -21,6 +25,14 @@ const response = ref('')
 const html = computed(() => {
     return marked.parse(response.value)
 })
+
+function resetInputForm(index = 0) {
+    Object.assign(inputForm, getInitialForm(), config.quickChatList[0])
+    if (index > 0) {
+        Object.assign(inputForm, config.quickChatList[index])
+        handleSubmit()
+    }
+}
 
 async function handleSubmit() {
     response.value = '......'
@@ -30,7 +42,7 @@ async function handleSubmit() {
     // or generateContent
     const res = await ai.models.generateContentStream({
         model: inputForm.model,
-        contents: inputForm.prompt,
+        contents: prompt.value,
         config: {
             thinkingConfig: {
                 thinkingBudget: inputForm.isThinking ? -1 : 0,
@@ -40,12 +52,13 @@ async function handleSubmit() {
                     // 搜索太慢，还不如chatgpt和grok
                     googleSearch: inputForm.isSearch ? {} : undefined
                 }
-            ]
-            // systemInstruction: "You are a cat. Your name is Neko.",
+            ],
+            systemInstruction: inputForm.systemInstruction,
         }
     })
         .finally(() => {
-            Object.assign(inputForm, getInitialForm())
+            prompt.value = ''
+            resetInputForm()
         })
     response.value = ''
     for await (const chunk of res) {
@@ -56,11 +69,26 @@ async function handleSubmit() {
 function openSettings() {
     window.electron.ipcRenderer.invoke('electron-store', 'openInEditor')
 }
+
+const handleKeydown = (e) => {
+    // 判断是否按下了 Ctrl 键
+    if (e.ctrlKey) {
+        // e.key 是字符串，比如 "1"、"2"...
+        if (/^[0-9]$/.test(e.key)) {
+            resetInputForm(parseInt(e.key))
+        } else if (e.key === 'Enter') {
+            handleSubmit()
+        } else if (e.key === 's') {
+            inputForm.isSearch = !inputForm.isSearch
+        } else if (e.key === 't') {
+            inputForm.isThinking = !inputForm.isThinking
+        }
+    };
+}
 </script>
 
 <template>
-    <div id="out-box" @keydown.ctrl.enter="handleSubmit" @keydown.ctrl.s="inputForm.isSearch = !inputForm.isSearch"
-        @keydown.ctrl.t="inputForm.isThinking = !inputForm.isThinking">
+    <div id="out-box" @keydown="handleKeydown">
         <div id="text" v-html="html">
         </div>
         <div id="input-bar">
@@ -83,8 +111,13 @@ function openSettings() {
                     <input type="checkbox" v-model="inputForm.isThinking">
                     <u>T</u>hinking
                 </label>
+                <button v-if="config?.quickChatList.length" v-for="(quickChat, i) in config.quickChatList.slice(1)"
+                    :key="i" @click="resetInputForm(i + 1)">
+                    <u>{{ i + 1 }}</u>
+                    {{ quickChat.name }}
+                </button>
             </div>
-            <textarea v-model="inputForm.prompt" autofocus accesskey="i"></textarea>
+            <textarea v-model="prompt" autofocus accesskey="i"></textarea>
             <button @click="handleSubmit">Send<br>(Ctrl + Enter)</button>
         </div>
     </div>
