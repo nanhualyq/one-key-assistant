@@ -15,7 +15,7 @@ app.config.errorHandler = (err, _instance, _info) => {
 }
 
 // 同步错误（例如普通函数里 throw）
-window.onerror = (message, source, lineno, colno, error) => {
+window.onerror = (message, _source, _lineno, _colno, error) => {
     Modal.error({ keyboard: false, content: error?.stack || message + '' })
 }
 
