@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GoogleGenAI } from '@google/genai';
+import { Chat, GoogleGenAI } from '@google/genai';
 import { marked } from 'marked';
 import { computed, onMounted, reactive, ref } from 'vue';
 
@@ -34,15 +34,27 @@ function resetInputForm(index = 0) {
     }
 }
 
-async function handleSubmit() {
-    response.value = '......'
+let chat: Chat | undefined
+const loading = ref(false)
+
+function newChat() {
     const ai = new GoogleGenAI({
         apiKey: config.apiKey
     })
+    return ai.chats.create({
+        model: inputForm.model
+    })
+}
+
+async function handleSubmit() {
+    loading.value = true
+    if (!chat) {
+        chat = await newChat()
+    }
+
     // or generateContent
-    const res = await ai.models.generateContentStream({
-        model: inputForm.model,
-        contents: prompt.value,
+    const res = await chat.sendMessageStream({
+        message: prompt.value,
         config: {
             thinkingConfig: {
                 thinkingBudget: inputForm.isThinking ? -1 : 0,
@@ -58,9 +70,11 @@ async function handleSubmit() {
     })
         .finally(() => {
             prompt.value = ''
-            resetInputForm()
+            loading.value = false
         })
-    response.value = ''
+    if (response.value) {
+        response.value += '\n\n---\n\n'
+    }
     for await (const chunk of res) {
         response.value += chunk.text || ''
     }
@@ -91,6 +105,7 @@ const handleKeydown = (e) => {
     <div id="out-box" @keydown="handleKeydown">
         <div id="text" v-html="html">
         </div>
+        <a-spin v-show="loading" />
         <div id="input-bar">
             <div class="tools">
                 <button @click="openSettings">Settings</button>
