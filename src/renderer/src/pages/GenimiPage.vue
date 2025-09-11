@@ -28,7 +28,7 @@ const html = computed(() => {
 
 function resetInputForm(index = 0) {
     Object.assign(inputForm, getInitialForm(), config.quickChatList[0])
-    if (index > 0) {
+    if (index > 0 && config.quickChatList[index]) {
         Object.assign(inputForm, config.quickChatList[index])
         handleSubmit()
     }
