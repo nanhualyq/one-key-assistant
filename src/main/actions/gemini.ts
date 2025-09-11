@@ -4,7 +4,7 @@ export default function () {
     const win = createBaseWindow({
         frame: false,
         // transparent: true,
-        alwaysOnTop: true,
+        // alwaysOnTop: true,
         skipTaskbar: true,
     })
     setWindowUrl(win, 'gemini')
