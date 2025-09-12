@@ -10,8 +10,9 @@ onMounted(async () => {
     config = reactive(config)
     resetInputForm()
     prompt.value = await window.api.clipboard.readText('selection')
-    console.log(prompt.value, `prompt.value`);
-    
+    if (prompt.value) {
+        prompt.value += '\n\n---\n\n'
+    }
 })
 
 const prompt = ref('')
@@ -135,7 +136,8 @@ const handleKeydown = (e) => {
                     {{ quickChat.name }}
                 </button>
             </div>
-            <a-textarea v-model:value="prompt" autofocus accesskey="i" allowClear :autoSize="{minRows: 2, maxRows: 10}"></a-textarea>
+            <a-textarea v-model:value="prompt" autofocus accesskey="i" allowClear
+                :autoSize="{ minRows: 2, maxRows: 10 }"></a-textarea>
             <button @click="handleSubmit">Send<br>(Ctrl + Enter)</button>
         </div>
     </div>
