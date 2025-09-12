@@ -9,6 +9,7 @@ onMounted(async () => {
     config = await window.electron.ipcRenderer.invoke('electron-store', 'get', 'gemini') as GeminiConfig
     config = reactive(config)
     resetInputForm()
+    prompt.value = await window.api.clipboard.readText('selection')
 })
 
 const prompt = ref('')
@@ -132,7 +133,7 @@ const handleKeydown = (e) => {
                     {{ quickChat.name }}
                 </button>
             </div>
-            <textarea v-model="prompt" autofocus accesskey="i"></textarea>
+            <a-textarea v-model="prompt" autofocus accesskey="i" allowClear :autosize="{minRows: 2, maxRows: 10}"></a-textarea>
             <button @click="handleSubmit">Send<br>(Ctrl + Enter)</button>
         </div>
     </div>
