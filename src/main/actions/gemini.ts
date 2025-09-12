@@ -7,5 +7,6 @@ export default function () {
         // alwaysOnTop: true,
         skipTaskbar: true,
     })
+    // win.webContents.openDevTools()
     setWindowUrl(win, 'gemini')
 }

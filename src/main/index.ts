@@ -10,7 +10,7 @@ import './globalShortcuts.js'
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   if (process.env.NODE_ENV === 'development') {
-    installExtension(VUEJS_DEVTOOLS)
+    installExtension(VUEJS_DEVTOOLS, { loadExtensionOptions: { allowFileAccess: true } })
       .then((ext) => console.log(`Added Extension:  ${ext.name}`))
       .catch((err) => console.log('An error occurred: ', err))
   }
