@@ -1,11 +1,11 @@
 import { app, globalShortcut, ipcMain } from "electron";
-import popupWindow from "./popupWindow.js";
 import store from "./settings.js";
 import gemini from "./actions/gemini.js";
+import youdao from "./actions/youdao.js";
 
 const targetMap = {
     test: () => console.log('test'),
-    youdao: popupWindow,
+    youdao,
     gemini
 }
 

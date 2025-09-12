@@ -12,7 +12,7 @@ export default function () {
         movable: true,
         show: false,
         webPreferences: {
-            nodeIntegration: true,
+            // nodeIntegration: true,
         },
     })
 
