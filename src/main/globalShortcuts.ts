@@ -1,12 +1,13 @@
 import { app, globalShortcut, ipcMain } from "electron";
 import store from "./settings.js";
-import gemini from "./actions/gemini.js";
 import youdao from "./actions/youdao.js";
+import actionWindow from "./actionWindow.js";
 
 const targetMap = {
     test: () => console.log('test'),
     youdao,
-    gemini
+    gemini: () => actionWindow('gemini'),
+    tts: () => actionWindow('tts')
 }
 
 app.whenReady().then(() => {

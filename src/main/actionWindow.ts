@@ -1,6 +1,6 @@
-import { createBaseWindow, setWindowUrl } from "../mainWindow.js";
+import { createBaseWindow, setWindowUrl } from "./mainWindow.js";
 
-export default function () {
+export default function (hash: string = '') {
     const win = createBaseWindow({
         frame: false,
         // transparent: true,
@@ -8,5 +8,5 @@ export default function () {
         skipTaskbar: true,
     })
     // win.webContents.openDevTools()
-    setWindowUrl(win, 'gemini')
+    setWindowUrl(win, hash)
 }
