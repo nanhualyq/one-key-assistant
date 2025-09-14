@@ -84,10 +84,6 @@ async function handleSubmit() {
     }
 }
 
-function openSettings() {
-    window.electron.ipcRenderer.invoke('electron-store', 'openInEditor')
-}
-
 const handleKeydown = (e) => {
     // 判断是否按下了 Ctrl 键
     if (e.ctrlKey) {
@@ -112,7 +108,6 @@ const handleKeydown = (e) => {
         <a-spin v-show="loading" />
         <div id="input-bar">
             <div class="tools">
-                <button @click="openSettings">Settings</button>
                 <label accesskey="m"><u>M</u>odel
                     <select v-model="inputForm.model">
                         <option value="gemini-2.5-pro">gemini-2.5-pro</option>

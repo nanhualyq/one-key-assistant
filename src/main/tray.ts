@@ -1,6 +1,7 @@
 import { app, Menu, nativeImage, Tray } from 'electron'
 import icon from '../../resources/icon.png?asset'
 import { mainWindow } from './mainWindow.js'
+import store from './settings.js'
 
 let img = nativeImage.createFromPath(icon)
 if (process.env.NODE_ENV === 'development') {
@@ -11,8 +12,26 @@ let tray: Tray
 app.whenReady().then(() => {
   tray = new Tray(img)
   const contextMenu = Menu.buildFromTemplate([
-    { label: '退出', click: () => { app.quit(); } }
-  ]);
+    {
+      label: 'Settings',
+      click: () => {
+        store.openInEditor()
+      }
+    },
+    {
+      label: 'Restart',
+      click: () => {
+        app.relaunch()
+        app.exit()
+      }
+    },
+    {
+      label: 'Quit',
+      click: () => {
+        app.quit()
+      }
+    }
+  ])
   tray.setToolTip('ONE-KEY-ASSISTANT')
   tray.setContextMenu(contextMenu)
   // app toggle show/hide when tray is clicked
