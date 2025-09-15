@@ -143,7 +143,6 @@ const handleKeydown = (e) => {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    border: 2px solid #333;
     box-sizing: border-box;
 }
 

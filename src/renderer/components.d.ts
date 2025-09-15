@@ -8,7 +8,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    ActionEditor: typeof import('./src/components/ActionEditor.vue')['default']
     AFlex: typeof import('ant-design-vue/es')['Flex']
     ASelect: typeof import('ant-design-vue/es')['Select']
     ASpin: typeof import('ant-design-vue/es')['Spin']
