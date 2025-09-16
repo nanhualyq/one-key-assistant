@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import GenimiPage from './pages/GenimiPage.vue'
+import GenimiPage from './pages/GeminiPage.vue'
 import TtsPage from './pages/TtsPage.vue'
 
 const routes = [

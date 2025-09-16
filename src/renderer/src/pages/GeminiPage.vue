@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { Chat, GoogleGenAI } from '@google/genai';
-import { marked } from 'marked';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { Chat, GoogleGenAI } from '@google/genai'
+import { marked } from 'marked'
+import { computed, onMounted, reactive, ref } from 'vue'
 
 let config: GeminiConfig
 
 onMounted(async () => {
-    config = await window.electron.ipcRenderer.invoke('electron-store', 'get', 'gemini') as GeminiConfig
+    config = (await window.electron.ipcRenderer.invoke(
+        'electron-store',
+        'get',
+        'gemini'
+    )) as GeminiConfig
     config = reactive(config)
     resetInputForm()
     prompt.value = await window.api.clipboard.readText('selection')
@@ -22,7 +26,7 @@ const getInitialForm = () => ({
     isThinking: false,
     isSearch: false,
     systemInstruction: ''
-});
+})
 const inputForm = reactive(getInitialForm())
 const response = ref('')
 
@@ -30,7 +34,7 @@ const html = computed(() => {
     return marked.parse(response.value)
 })
 
-function resetInputForm(index = 0) {
+function resetInputForm(index = 0): void {
     Object.assign(inputForm, getInitialForm(), config.quickChatList[0])
     if (index > 0 && config.quickChatList[index]) {
         Object.assign(inputForm, config.quickChatList[index])
@@ -41,7 +45,7 @@ function resetInputForm(index = 0) {
 let chat: Chat | undefined
 const loading = ref(false)
 
-function newChat() {
+function newChat(): Chat {
     const ai = new GoogleGenAI({
         apiKey: config.apiKey
     })
@@ -50,28 +54,29 @@ function newChat() {
     })
 }
 
-async function handleSubmit() {
+async function handleSubmit(): Promise<void> {
     loading.value = true
     if (!chat) {
         chat = await newChat()
     }
 
     // or generateContent
-    const res = await chat.sendMessageStream({
-        message: prompt.value,
-        config: {
-            thinkingConfig: {
-                thinkingBudget: inputForm.isThinking ? -1 : 0,
-            },
-            tools: [
-                {
-                    // 搜索太慢，还不如chatgpt和grok
-                    googleSearch: inputForm.isSearch ? {} : undefined
-                }
-            ],
-            systemInstruction: inputForm.systemInstruction,
-        }
-    })
+    const res = await chat
+        .sendMessageStream({
+            message: prompt.value,
+            config: {
+                thinkingConfig: {
+                    thinkingBudget: inputForm.isThinking ? -1 : 0
+                },
+                tools: [
+                    {
+                        // 搜索太慢，还不如chatgpt和grok
+                        googleSearch: inputForm.isSearch ? {} : undefined
+                    }
+                ],
+                systemInstruction: inputForm.systemInstruction
+            }
+        })
         .finally(() => {
             prompt.value = ''
             loading.value = false
@@ -84,7 +89,7 @@ async function handleSubmit() {
     }
 }
 
-const handleKeydown = (e) => {
+const handleKeydown = (e): void => {
     // 判断是否按下了 Ctrl 键
     if (e.ctrlKey) {
         // e.key 是字符串，比如 "1"、"2"...
@@ -97,14 +102,13 @@ const handleKeydown = (e) => {
         } else if (e.key === 't') {
             inputForm.isThinking = !inputForm.isThinking
         }
-    };
+    }
 }
 </script>
 
 <template>
     <div id="out-box" @keydown="handleKeydown">
-        <div id="text" v-html="html">
-        </div>
+        <div id="text" v-html="html"></div>
         <a-spin v-show="loading" />
         <div id="input-bar">
             <div class="tools">
@@ -118,22 +122,22 @@ const handleKeydown = (e) => {
                     </select>
                 </label>
                 <label>
-                    <input type="checkbox" v-model="inputForm.isSearch">
+                    <input v-model="inputForm.isSearch" type="checkbox" />
                     <u>S</u>earch
                 </label>
                 <label>
-                    <input type="checkbox" v-model="inputForm.isThinking">
+                    <input v-model="inputForm.isThinking" type="checkbox" />
                     <u>T</u>hinking
                 </label>
-                <button v-if="config?.quickChatList.length" v-for="(quickChat, i) in config.quickChatList.slice(1)"
-                    :key="i" @click="resetInputForm(i + 1)">
+                <button v-for="(quickChat, i) in config?.quickChatList.slice(1)" :key="i"
+                    @click="resetInputForm(i + 1)">
                     <u>{{ i + 1 }}</u>
                     {{ quickChat.name }}
                 </button>
             </div>
-            <a-textarea v-model:value="prompt" autofocus accesskey="i" allowClear
-                :autoSize="{ minRows: 2, maxRows: 10 }"></a-textarea>
-            <button @click="handleSubmit">Send<br>(Ctrl + Enter)</button>
+            <a-textarea v-model:value="prompt" autofocus accesskey="i" allow-clear
+                :auto-size="{ minRows: 2, maxRows: 10 }"></a-textarea>
+            <button @click="handleSubmit">Send<br />(Ctrl + Enter)</button>
         </div>
     </div>
 </template>
@@ -152,6 +156,20 @@ const handleKeydown = (e) => {
     overflow: auto;
 }
 
+#text :global(table) {
+    border-collapse: collapse;
+}
+
+#text :global(table th),
+#text :global(table td) {
+    border: 1px solid #999;
+    padding: 8px;
+}
+
+#text :global(table th) {
+    background-color: #f2f2f2;
+}
+
 :global(pre) {
     background-color: #eee;
     padding: 1rem;
@@ -163,8 +181,7 @@ const handleKeydown = (e) => {
     /* 两行，高度自适应 */
     grid-template-columns: 1fr max-content;
     /* 两列平分 */
-    grid-template-areas:
-        "item1 item1";
+    grid-template-areas: 'item1 item1';
     /* 第二行平分两列 */
     gap: 4px;
     padding: 8px;

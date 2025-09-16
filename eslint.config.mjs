@@ -12,6 +12,8 @@ export default tseslint.config(
     languageOptions: {
       parser: vueParser,
       parserOptions: {
+        project: './tsconfig.web.json',
+        tsconfigRootDir: __dirname,
         ecmaFeatures: {
           jsx: true
         },
