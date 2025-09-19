@@ -1,34 +1,43 @@
-# one-key-assistant
+# one-key-assistant (one-key-assistant)
 
-An Electron application with Vue and TypeScript
+A Quasar Project
 
-## Recommended IDE Setup
-
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-
-## Project Setup
-
-### Install
+## Install the dependencies
 
 ```bash
-$ npm install
+yarn
+# or
+npm install
 ```
 
-### Development
+### Start the app in development mode (hot-code reloading, error reporting, etc.)
 
 ```bash
-$ npm run dev
+quasar dev
 ```
 
-### Build
+### Lint the files
 
 ```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
+yarn lint
+# or
+npm run lint
 ```
+
+### Format the files
+
+```bash
+yarn format
+# or
+npm run format
+```
+
+### Build the app for production
+
+```bash
+quasar build
+```
+
+### Customize the configuration
+
+See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
