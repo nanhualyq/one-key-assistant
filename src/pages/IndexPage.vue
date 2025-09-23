@@ -1,43 +1,28 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
-  </q-page>
+  <q-btn @click="openYoudao">youdao</q-btn>
+  <q-btn @click="openGemini">gemini</q-btn>
+  <q-btn @click="openTTS">TTS</q-btn>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
-
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1',
-  },
-  {
-    id: 2,
-    content: 'ct2',
-  },
-  {
-    id: 3,
-    content: 'ct3',
-  },
-  {
-    id: 4,
-    content: 'ct4',
-  },
-  {
-    id: 5,
-    content: 'ct5',
-  },
-]);
-
-const meta = ref<Meta>({
-  totalCount: 1200,
-});
+function openYoudao() {
+  window.api.ipcRenderer.send('createWindow', {
+    width: 480,
+    // height: 640,
+    url: 'https:/www.youdao.com/result?word={SELECTION_TET}&lang=en',
+    headers: {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1'
+    }
+  })
+}
+function openGemini() {
+  window.api.ipcRenderer.send('createWindow', {
+    url: '{APP_URL}#/gemini'
+  })
+}
+function openTTS() {
+  window.api.ipcRenderer.send('createWindow', {
+    url: '{APP_URL}#/tts'
+  })
+}
 </script>

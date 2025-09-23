@@ -1,1 +1,12 @@
 // app global css in SCSS form
+table {
+  border-collapse: collapse; /* 讓表格邊框不重疊 */
+}
+
+table, th, td {
+  border: 1px solid #000; /* 黑色邊框，你可以改顏色 */
+}
+
+th, td {
+  padding: 8px; /* 預設內邊距 */
+}
