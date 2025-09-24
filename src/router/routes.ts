@@ -1,9 +1,16 @@
+import SettingsLayout from 'src/layouts/SettingsLayout.vue';
 import type { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('pages/IndexPage.vue')
+    component: SettingsLayout,
+    children: [
+      {
+        path: '/',
+        component: () => import('pages/IndexPage.vue')
+      }
+    ]
   },
   {
     path: '/gemini',

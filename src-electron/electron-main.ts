@@ -2,7 +2,7 @@ import { app, type BrowserWindow } from 'electron';
 import path from 'path';
 import os from 'os';
 import { fileURLToPath } from 'url'
-import './ipc-main'
+import './apis/ipc'
 import createWindow from './actions/createWindow';
 
 // needed in case process is undefined under Linux
