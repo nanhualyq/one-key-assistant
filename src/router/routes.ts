@@ -4,11 +4,19 @@ import type { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
+    redirect: '/settings/action'
+  },
+  {
+    path: '/settings',
     component: SettingsLayout,
     children: [
       {
-        path: '/',
-        component: () => import('pages/IndexPage.vue')
+        path: 'action',
+        component: () => import('pages/settings/ActionSetting.vue')
+      },
+      {
+        path: 'gemini',
+        component: () => import('pages/settings/GeminiSetting.vue')
       }
     ]
   },

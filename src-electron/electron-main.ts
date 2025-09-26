@@ -21,14 +21,6 @@ async function createMainWindow() {
     width: 1000,
     height: 600,
     useContentSize: true,
-    webPreferences: {
-      contextIsolation: true,
-      // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
-      preload: path.resolve(
-        currentDir,
-        path.join(process.env.QUASAR_ELECTRON_PRELOAD_FOLDER, 'electron-preload' + process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION)
-      ),
-    },
     url: '{APP_URL}'
   });
 

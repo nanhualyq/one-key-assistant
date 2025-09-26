@@ -11,7 +11,10 @@
             </q-page>
         </q-page-container>
         <q-footer bordered class="bg-white text-dark">
-            <p>something</p>
+            <p>
+                <q-select v-model="currentChatConfig" :options="chatIndexList" :option-label="getChatName"
+                    label="Chat Config" />
+            </p>
             <q-input v-model="prompt" @keydown.ctrl.enter="prompt && sendMessage()" type="textarea" autogrow clearable
                 outlined autofocus style="max-height: 80vh; overflow: auto;">
                 <template #append>
@@ -24,7 +27,7 @@
 
 <script setup lang="ts">
 import { type Chat, GoogleGenAI } from '@google/genai';
-import { onMounted, reactive, ref } from 'vue'
+import { computed, inject, onMounted, reactive, type Ref, ref, watch } from 'vue'
 import { Marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
@@ -45,38 +48,54 @@ const prompt = ref('')
 let chat: Chat
 const messages = reactive<string[]>([])
 const messageLoading = ref(false)
+const settings = inject<Ref<SettingsJson>>('settings')
+const currentChatConfig = ref(0)
+const chatIndexList = computed(() => {
+    return Object.keys(settings?.value.gemini?.chats || []).map(Number)
+})
 
-onMounted(newChat)
+onMounted(() => {
+    console.log('onMounted');
+})
+
+watch(currentChatConfig, newChat)
+const chatConfig = computed(() => {
+    return settings?.value.gemini?.chats?.[currentChatConfig.value]
+})
 
 function newChat() {
     const ai = new GoogleGenAI({
-        apiKey: 'AIzaSyDQo70DSr8DHK2CwVkF2o0BIg8yMYFlJCE'
+        apiKey: settings?.value.gemini?.apiKey || ''
     })
     chat = ai.chats.create({
-        model: 'gemini-2.5-flash'
+        model: chatConfig.value?.model || 'gemini-2.5-flash'
     })
 }
 
 async function sendMessage() {
+    if (!chat) {
+        newChat()
+    }
     messageLoading.value = true
     messages.push(prompt.value)
     prompt.value = ''
     const input = messages[messages.length - 1]
     messages.push('')
+    const tools = []
+    if (chatConfig.value?.googleSearch) {
+        tools.push({
+            googleSearch: {}
+        })
+    }
     const res = await chat
         .sendMessageStream({
             message: input!,
             config: {
+                tools,
                 thinkingConfig: {
-                    thinkingBudget: 0
+                    thinkingBudget: chatConfig.value?.thinkingBudget ?? 0
                 },
-                tools: [
-                    {
-                        // 搜索太慢，还不如chatgpt和grok
-                        // googleSearch: inputForm.isSearch ? {} : undefined
-                    }
-                ],
-                // systemInstruction: inputForm.systemInstruction
+                systemInstruction: chatConfig.value?.systemInstruction || ''
             }
         })
         .finally(() => {
@@ -93,6 +112,9 @@ function isMe(i: number) {
 }
 function isInputting(i: number) {
     return messageLoading.value && i === messages.length - 1
+}
+function getChatName(index: number) {
+    return settings?.value.gemini?.chats?.[index]?.name || ''
 }
 </script>
 

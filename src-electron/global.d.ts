@@ -7,11 +7,23 @@ type Action = {
   params?: unknown
 }
 
+type Gemini = {
+  apiKey: string
+  chats?: {
+    name: string
+    model: string
+    systemInstruction?: string
+    thinkingBudget: number
+    googleSearch: boolean
+  }[]
+}
+
 declare global {
   interface Window {
     api: typeof api
   }
   type SettingsJson = {
     actions?: Action[]
+    gemini?: Gemini
   }
 }

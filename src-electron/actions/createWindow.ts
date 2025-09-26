@@ -1,4 +1,5 @@
 import { BrowserWindow, clipboard } from "electron";
+import path from "path";
 import { fileURLToPath } from "url";
 
 type Options = Electron.BrowserWindowConstructorOptions & {
@@ -7,6 +8,7 @@ type Options = Electron.BrowserWindowConstructorOptions & {
 }
 
 const APP_URL = process.env.DEV ? process.env.APP_URL : `file://${fileURLToPath(new URL('.', import.meta.url))}/index.html`
+const currentDir = fileURLToPath(new URL('.', import.meta.url));
 
 function replaceTemplate(raw: string) {
     return raw.replaceAll('{SELECTION_TET}', clipboard.readText('selection'))
@@ -14,6 +16,15 @@ function replaceTemplate(raw: string) {
 }
 
 export default async function (options: Options) {
+    options.webPreferences = {
+        contextIsolation: true,
+        // More info: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/electron-preload-script
+        preload: path.resolve(
+            currentDir,
+            '..',
+            path.join(process.env.QUASAR_ELECTRON_PRELOAD_FOLDER, 'electron-preload' + process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION)
+        ),
+    }
     const win = new BrowserWindow(options)
     if (options.url) {
         const url = replaceTemplate(options.url)
