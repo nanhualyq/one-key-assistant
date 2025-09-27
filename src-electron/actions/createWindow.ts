@@ -25,6 +25,7 @@ export default async function (options: Options) {
             path.join(process.env.QUASAR_ELECTRON_PRELOAD_FOLDER, 'electron-preload' + process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION)
         ),
     }
+    options.icon = path.resolve(currentDir, '..', 'icons/icon.png') // tray icon
     const win = new BrowserWindow(options)
     if (options.url) {
         const url = replaceTemplate(options.url)

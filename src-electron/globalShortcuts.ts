@@ -1,11 +1,6 @@
 import { app, globalShortcut, ipcMain } from 'electron'
-import createWindow from './actions/createWindow.js'
 import { loadSettings } from './apis/settings.js'
 import { type Action } from './global.js'
-
-const targetMap: { [key: string]: unknown } = {
-    createWindow
-}
 
 void app.whenReady().then(() => {
     ipcMain.on('resetActionsShortcut', loadConfigShortcut)
@@ -23,9 +18,10 @@ function nullTarget(): void {
 }
 
 function callback(action: Action) {
-    const key = action.function
-    const target = targetMap[key] || nullTarget
-    return (target as (...args: unknown[]) => void)(action.params)
+    if (!action.function) {
+        nullTarget()
+    }
+    ipcMain.emit(action.function, {}, action.params)
 }
 
 export function loadConfigShortcut(): void {
