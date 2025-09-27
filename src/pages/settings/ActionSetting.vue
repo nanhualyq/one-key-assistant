@@ -8,7 +8,11 @@
       </div>
       <q-list>
         <q-expansion-item v-for="(action, index) in actions" :key="index" :label="action.name">
-          <JsonEditor :model-value="action" @update:model-value="actions[index] = $event" />
+          <q-input v-model="action.name" type="text" label="name" />
+          <q-input v-model="action.shortcut" type="text" label="shortcut" />
+          <q-input v-model="action.function" type="text" label="function" />
+          <JsonEditor :model-value="action.params" @update:model-value="actions[index]!.params = $event"
+            label="params" />
           <q-btn icon="play" label="Test" @click="testAction(action)" />
           <q-btn icon="delete" label="Delete" @click="actions.splice(index, 1)" />
           <q-btn icon="up" label="Up" @click="swapIndex(index, -1)" :disable="index === 0" />
