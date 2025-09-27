@@ -18,6 +18,10 @@ type Gemini = {
   }[]
 }
 
+type Tts = {
+  kokoroApi: string
+}
+
 declare global {
   interface Window {
     api: typeof api
@@ -25,5 +29,6 @@ declare global {
   type SettingsJson = {
     actions?: Action[]
     gemini?: Gemini
+    tts?: Tts
   }
 }

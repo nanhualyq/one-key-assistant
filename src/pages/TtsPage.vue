@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, reactive, ref, watch } from "vue";
+import { inject, nextTick, onMounted, reactive, type Ref, ref, watch } from "vue";
 
 const audioSrc = ref('')
 const voice = ref('zf_xiaoxiao')
@@ -37,6 +37,7 @@ const showInput = ref(false)
 const inputText = ref('')
 const readTextList = ref<string[]>([])
 const index = ref(-1)
+const settings = inject<Ref<SettingsJson>>('settings')
 
 onMounted(() => getVoices())
 
@@ -47,7 +48,8 @@ function fetchKokoroTts(url: string, options?: RequestInit) {
             'content-type': 'application/json'
         }
     }
-    return fetch(`http://localhost:8880${url}`, options)
+    const api = settings?.value.tts?.kokoroApi || 'http://localhost:8880'
+    return fetch(`${api.replace(/\/$/, '')}${url}`, options)
 }
 
 async function play(input: string) {

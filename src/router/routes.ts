@@ -17,6 +17,10 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'gemini',
         component: () => import('pages/settings/GeminiSetting.vue')
+      },
+      {
+        path: 'tts',
+        component: () => import('pages/settings/TtsSetting.vue')
       }
     ]
   },
