@@ -1,5 +1,5 @@
 import { app, ipcMain } from "electron";
-import createWindow from "../actions/createWindow";
+import createWindow from "../createWindow";
 import { loadSettings, saveSettings } from "./settings";
 
 void app.whenReady().then(registerIpcMain)

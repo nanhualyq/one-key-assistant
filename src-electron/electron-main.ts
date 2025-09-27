@@ -1,6 +1,6 @@
 import { app, dialog, ipcMain, type BrowserWindow } from 'electron';
 import os from 'os';
-import createWindow from './actions/createWindow';
+import createWindow from './createWindow';
 import './apis/ipc'
 import './globalShortcuts'
 import './tray'
