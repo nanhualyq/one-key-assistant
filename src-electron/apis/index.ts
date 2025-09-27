@@ -3,7 +3,7 @@ import { ipcRenderer } from "electron"
 const api = {
     ipcRenderer: {
         send(key: string, ...args: unknown[]) {
-            if (['createWindow'].includes(key)) {
+            if (['createWindow', 'resetActionsShortcut'].includes(key)) {
                 return ipcRenderer.send(key, ...args)
             }
         },

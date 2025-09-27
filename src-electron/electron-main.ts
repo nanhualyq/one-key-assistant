@@ -2,8 +2,9 @@ import { app, type BrowserWindow } from 'electron';
 import path from 'path';
 import os from 'os';
 import { fileURLToPath } from 'url'
-import './apis/ipc'
 import createWindow from './actions/createWindow';
+import './apis/ipc'
+import './globalShortcuts'
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform();

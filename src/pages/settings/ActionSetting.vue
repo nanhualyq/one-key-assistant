@@ -43,6 +43,7 @@ function onSubmit() {
   settings.value.actions = actions.value
   if (saveSettings) {
     saveSettings()
+    window.api.ipcRenderer.send('resetActionsShortcut')
   }
 }
 function onReset() {
