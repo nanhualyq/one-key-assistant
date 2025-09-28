@@ -8,7 +8,7 @@ const api = {
             }
         },
         invoke(key: string, ...args: unknown[]) {
-            if (['loadSettings', 'saveSettings'].includes(key)) {
+            if (['loadSettings', 'saveSettings', 'replaceTemplate'].includes(key)) {
                 return ipcRenderer.invoke(key, ...args)
             }
         },

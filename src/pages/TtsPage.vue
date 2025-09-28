@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { inject, nextTick, onMounted, reactive, type Ref, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
 const audioSrc = ref('')
 const voice = ref('zf_xiaoxiao')
@@ -38,8 +39,12 @@ const inputText = ref('')
 const readTextList = ref<string[]>([])
 const index = ref(-1)
 const settings = inject<Ref<SettingsJson>>('settings')
+const route = useRoute()
 
-onMounted(() => getVoices())
+onMounted(() => {
+    void getVoices()
+    void handleUrlQuery()
+})
 
 function fetchKokoroTts(url: string, options?: RequestInit) {
     if (options && options.method === 'POST') {
@@ -64,7 +69,6 @@ async function play(input: string) {
         .then(blob => URL.createObjectURL(blob))
 }
 function onPlayed() {
-    URL.revokeObjectURL(audioSrc.value)
     playIndex(index.value + 1)
 }
 
@@ -84,6 +88,8 @@ function startText(input: string) {
     playIndex(0)
 }
 function playIndex(i: number) {
+    URL.revokeObjectURL(audioSrc.value)
+    audioSrc.value = ''
     index.value = i
     if (!readTextList.value[i]) {
         return
@@ -104,6 +110,13 @@ function scrollToHighlight() {
 watch(index, () => {
     scrollToHighlight()
 })
+async function handleUrlQuery() {
+    const { input_selection_text } = route.query
+    if (input_selection_text) {
+        const text = await window.api.ipcRenderer.invoke('replaceTemplate', '{SELECTION_TEXT}')
+        startText(text)
+    }
+}
 </script>
 
 <style scoped lang="scss">

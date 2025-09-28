@@ -32,6 +32,7 @@ import { Marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
+import { useRoute } from 'vue-router';
 
 const marked = new Marked(
     markedHighlight({
@@ -44,6 +45,7 @@ const marked = new Marked(
     })
 );
 
+const route = useRoute()
 const prompt = ref('')
 let chat: Chat
 const messages = reactive<string[]>([])
@@ -54,9 +56,7 @@ const chatIndexList = computed(() => {
     return Object.keys(settings?.value.gemini?.chats || []).map(Number)
 })
 
-onMounted(() => {
-    console.log('onMounted');
-})
+onMounted(handleUrlQuery)
 
 watch(currentChatConfig, newChat)
 const chatConfig = computed(() => {
@@ -115,6 +115,18 @@ function isInputting(i: number) {
 }
 function getChatName(index: number) {
     return settings?.value.gemini?.chats?.[index]?.name || ''
+}
+async function handleUrlQuery() {
+    const { input_selection_text, chat, start } = route.query
+    if (input_selection_text) {
+        prompt.value = await window.api.ipcRenderer.invoke('replaceTemplate', '{SELECTION_TEXT}')
+    }
+    if (chat) {
+        currentChatConfig.value = Number(chat)
+    }
+    if (start) {
+        void sendMessage()
+    }
 }
 </script>
 

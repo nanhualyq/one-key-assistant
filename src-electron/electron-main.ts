@@ -25,15 +25,17 @@ async function createMainWindow() {
     mainWindow = undefined;
   });
 
-  // 监听窗口的 'close' 事件，而不是 'closed'
-  // 'close' 事件在窗口实际关闭之前触发，我们可以阻止它
-  mainWindow.on('close', (event) => {
-    // 阻止窗口默认的关闭行为（即销毁窗口）
-    event.preventDefault()
+  if (!process.env.DEBUGGING) {
+    // 监听窗口的 'close' 事件，而不是 'closed'
+    // 'close' 事件在窗口实际关闭之前触发，我们可以阻止它
+    mainWindow.on('close', (event) => {
+      // 阻止窗口默认的关闭行为（即销毁窗口）
+      event.preventDefault()
 
-    // 隐藏窗口
-    mainWindow?.hide()
-  })
+      // 隐藏窗口
+      mainWindow?.hide()
+    })
+  }
 }
 
 ipcMain.on('toggleWindow', () => {

@@ -1,19 +1,15 @@
-import { BrowserWindow, clipboard } from "electron";
+import { BrowserWindow } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
+import { replaceTemplate } from "./utils";
 
 type Options = Electron.BrowserWindowConstructorOptions & {
     url?: string,
     headers?: Electron.LoadURLOptions
 }
 
-const APP_URL = process.env.DEV ? process.env.APP_URL : `file://${fileURLToPath(new URL('.', import.meta.url))}/index.html`
+export const APP_URL = process.env.DEV ? process.env.APP_URL : `file://${fileURLToPath(new URL('.', import.meta.url))}/index.html`
 const currentDir = fileURLToPath(new URL('.', import.meta.url));
-
-function replaceTemplate(raw: string) {
-    return raw.replaceAll('{SELECTION_TET}', clipboard.readText('selection'))
-        .replaceAll('{APP_URL}', APP_URL)
-}
 
 export default async function (options: Options) {
     options.webPreferences = {
