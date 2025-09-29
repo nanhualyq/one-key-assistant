@@ -5,7 +5,13 @@
                 <q-chat-message v-for="(m, i) in messages" :key="i" :name="isMe(i) ? 'me' : 'Gemini'"
                     :avatar="isMe(i) ? 'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-avatar-placeholder-png-image_3416697.jpg' : 'https://www.gstatic.com/lamda/images/gemini_sparkle_4g_512_lt_f94943af3be039176192d.png'"
                     :sent="isMe(i)" :class="{ 'self-end': isMe(i) }" bg-color="grey-1">
-                    <div :class="{ inputting: isInputting(i) }" v-html="marked.parse(m)">
+                    <div v-if="isMe(i)" class="multiline">
+                        {{ m }}
+                        <q-toolbar>
+                            <q-btn size="sm" flat round dense icon="sync" title="Try again" @click="TryAgain(i)" />
+                        </q-toolbar>
+                    </div>
+                    <div v-else v-scroll :class="{ inputting: isInputting(i) }" v-html="marked.parse(m)">
                     </div>
                 </q-chat-message>
             </q-page>
@@ -62,6 +68,15 @@ watch(currentChatConfig, newChat)
 const chatConfig = computed(() => {
     return settings?.value.gemini?.chats?.[currentChatConfig.value]
 })
+
+// 回答时自动滚动到输出位置
+const vScroll = {
+    mounted(el: HTMLElement) {
+        if (el.classList.contains('inputting')) {
+            el.scrollIntoView()
+        }
+    }
+}
 
 function newChat() {
     const ai = new GoogleGenAI({
@@ -128,6 +143,10 @@ async function handleUrlQuery() {
         void sendMessage()
     }
 }
+function TryAgain(i: number) {
+    prompt.value = messages[i]!
+    void sendMessage()
+}
 </script>
 
 <style scoped lang="scss">
@@ -148,5 +167,14 @@ async function handleUrlQuery() {
     100% {
         opacity: 1;
     }
+}
+
+.multiline {
+    white-space: pre-line;
+}
+
+:global(pre code) {
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 </style>
