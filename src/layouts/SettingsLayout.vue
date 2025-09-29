@@ -1,15 +1,9 @@
 <template>
     <q-layout view="lHr LpR LFf">
-        <q-header>
-            <q-toolbar>
-                <q-btn flat @click="drawerLeft = !drawerLeft" round dense icon="menu" />
-                <q-toolbar-title>Settings</q-toolbar-title>
-            </q-toolbar>
-        </q-header>
         <q-page-container>
             <router-view />
         </q-page-container>
-        <q-drawer side="left" v-model="drawerLeft" borderd>
+        <q-drawer side="left" :model-value="true" borderd :breakpoint="0">
             <q-list bordered>
                 <q-item clickable v-ripple to="/settings/action">
                     <q-item-section avatar>
@@ -35,7 +29,4 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
-const drawerLeft = ref(false)
 </script>
