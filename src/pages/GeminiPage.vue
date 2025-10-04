@@ -1,34 +1,34 @@
 <template>
-    <q-layout view="lHh Lpr lFf">
-        <q-page-container>
-            <q-page class="q-pa-md column">
-                <q-chat-message v-for="(m, i) in messages" :key="i" :name="isMe(i) ? 'me' : 'Gemini'"
-                    :avatar="isMe(i) ? 'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-avatar-placeholder-png-image_3416697.jpg' : 'https://www.gstatic.com/lamda/images/gemini_sparkle_4g_512_lt_f94943af3be039176192d.png'"
-                    :sent="isMe(i)" :class="{ 'self-end': isMe(i) }" bg-color="grey-1">
-                    <div v-if="isMe(i)" class="multiline">
-                        {{ m }}
-                        <q-toolbar>
-                            <q-btn size="sm" flat round dense icon="sync" title="Try again" @click="TryAgain(i)" />
-                        </q-toolbar>
-                    </div>
-                    <div v-else v-scroll :class="{ inputting: isInputting(i) }" v-html="marked.parse(m)">
-                    </div>
-                </q-chat-message>
-            </q-page>
-        </q-page-container>
-        <q-footer bordered class="bg-white text-dark">
-            <p>
-                <q-select v-model="currentChatConfig" :options="chatIndexList" :option-label="getChatName"
-                    label="Chat Config" />
-            </p>
-            <q-input v-model="prompt" @keydown.ctrl.enter="prompt && sendMessage()" type="textarea" autogrow clearable
-                outlined autofocus style="max-height: 80vh; overflow: auto;">
-                <template #append>
-                    <q-btn color="primary" icon="send" @click="sendMessage" :disable="!prompt"></q-btn>
-                </template>
-            </q-input>
-        </q-footer>
-    </q-layout>
+  <q-layout view="lHh Lpr lFf">
+    <q-page-container>
+      <q-page class="q-pa-md column">
+        <q-chat-message v-for="(m, i) in messages" :key="i" :name="isMe(i) ? 'me' : 'Gemini'" :avatar="getAvatar(i)"
+          :sent="isMe(i)" :class="{ 'self-end': isMe(i) }" bg-color="grey-1">
+          <div v-if="isMe(i)" class="multiline">
+            {{ m }}
+            <q-toolbar>
+              <q-btn size="sm" flat round dense icon="sync" title="Try again" @click="TryAgain(i)" />
+              <q-btn size="sm" flat round dense icon="edit" title="Edit" @click="editChat(i)" />
+            </q-toolbar>
+          </div>
+          <div v-else v-scroll :class="{ inputting: isInputting(i) }" v-html="marked.parse(m)">
+          </div>
+        </q-chat-message>
+      </q-page>
+    </q-page-container>
+    <q-footer bordered class="bg-white text-dark">
+      <p>
+        <q-select v-model="currentChatConfig" :options="chatIndexList" :option-label="getChatName"
+          label="Chat Config" />
+      </p>
+      <q-input v-model="prompt" @keydown.ctrl.enter="prompt && sendMessage()" type="textarea" autogrow clearable
+        outlined autofocus style="max-height: 80vh; overflow: auto;" accesskey="i" ref="input">
+        <template #append>
+          <q-btn color="primary" icon="send" @click="sendMessage" :disable="!prompt"></q-btn>
+        </template>
+      </q-input>
+    </q-footer>
+  </q-layout>
 </template>
 
 <script setup lang="ts">
@@ -41,14 +41,14 @@ import 'highlight.js/styles/atom-one-dark.css';
 import { useRoute } from 'vue-router';
 
 const marked = new Marked(
-    markedHighlight({
-        emptyLangClass: 'hljs',
-        langPrefix: 'hljs language-',
-        highlight(code, lang) {
-            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-            return hljs.highlight(code, { language }).value;
-        }
-    })
+  markedHighlight({
+    emptyLangClass: 'hljs',
+    langPrefix: 'hljs language-',
+    highlight(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+      return hljs.highlight(code, { language }).value;
+    }
+  })
 );
 
 const route = useRoute()
@@ -59,122 +59,130 @@ const messageLoading = ref(false)
 const settings = inject<Ref<SettingsJson>>('settings')
 const currentChatConfig = ref(0)
 const chatIndexList = computed(() => {
-    return Object.keys(settings?.value.gemini?.chats || []).map(Number)
+  return Object.keys(settings?.value.gemini?.chats || []).map(Number)
 })
+const input = ref()
 
 onMounted(handleUrlQuery)
 
 watch(currentChatConfig, newChat)
 const chatConfig = computed(() => {
-    return settings?.value.gemini?.chats?.[currentChatConfig.value]
+  return settings?.value.gemini?.chats?.[currentChatConfig.value]
 })
 
 // 回答时自动滚动到输出位置
 const vScroll = {
-    mounted(el: HTMLElement) {
-        if (el.classList.contains('inputting')) {
-            el.scrollIntoView()
-        }
+  mounted(el: HTMLElement) {
+    if (el.classList.contains('inputting')) {
+      el.scrollIntoView()
     }
+  }
 }
 
 function newChat() {
-    const ai = new GoogleGenAI({
-        apiKey: settings?.value.gemini?.apiKey || ''
-    })
-    chat = ai.chats.create({
-        model: chatConfig.value?.model || 'gemini-2.5-flash'
-    })
+  const ai = new GoogleGenAI({
+    apiKey: settings?.value.gemini?.apiKey || ''
+  })
+  chat = ai.chats.create({
+    model: chatConfig.value?.model || 'gemini-2.5-flash'
+  })
 }
 
 async function sendMessage() {
-    if (!chat) {
-        newChat()
-    }
-    messageLoading.value = true
-    messages.push(prompt.value)
-    prompt.value = ''
-    const input = messages[messages.length - 1]
-    messages.push('')
-    const tools = []
-    if (chatConfig.value?.googleSearch) {
-        tools.push({
-            googleSearch: {}
-        })
-    }
-    const res = await chat
-        .sendMessageStream({
-            message: input!,
-            config: {
-                tools,
-                thinkingConfig: {
-                    thinkingBudget: chatConfig.value?.thinkingBudget ?? 0
-                },
-                systemInstruction: chatConfig.value?.systemInstruction || ''
-            }
-        })
-        .finally(() => {
-            prompt.value = ''
-            messageLoading.value = false
-        })
-    for await (const chunk of res) {
-        messages[messages.length - 1] += chunk.text || ''
-    }
+  if (!chat) {
+    newChat()
+  }
+  messageLoading.value = true
+  messages.push(prompt.value)
+  prompt.value = ''
+  const input = messages[messages.length - 1]
+  messages.push('')
+  const tools = []
+  if (chatConfig.value?.googleSearch) {
+    tools.push({
+      googleSearch: {}
+    })
+  }
+  const res = await chat
+    .sendMessageStream({
+      message: input!,
+      config: {
+        tools,
+        thinkingConfig: {
+          thinkingBudget: chatConfig.value?.thinkingBudget ?? 0
+        },
+        systemInstruction: chatConfig.value?.systemInstruction || ''
+      }
+    })
+    .finally(() => {
+      prompt.value = ''
+      messageLoading.value = false
+    })
+  for await (const chunk of res) {
+    messages[messages.length - 1] += chunk.text || ''
+  }
 }
 
 function isMe(i: number) {
-    return i % 2 === 0
+  return i % 2 === 0
 }
 function isInputting(i: number) {
-    return messageLoading.value && i === messages.length - 1
+  return messageLoading.value && i === messages.length - 1
 }
 function getChatName(index: number) {
-    return settings?.value.gemini?.chats?.[index]?.name || ''
+  return settings?.value.gemini?.chats?.[index]?.name || ''
 }
 async function handleUrlQuery() {
-    const { input_selection_text, chat, start } = route.query
-    if (input_selection_text) {
-        prompt.value = await window.api.ipcRenderer.invoke('replaceTemplate', '{SELECTION_TEXT}')
-    }
-    if (chat) {
-        currentChatConfig.value = Number(chat)
-    }
-    if (start) {
-        void sendMessage()
-    }
+  const { input_selection_text, chat, start } = route.query
+  if (input_selection_text) {
+    prompt.value = await window.api.ipcRenderer.invoke('replaceTemplate', '{SELECTION_TEXT}')
+  }
+  if (chat) {
+    currentChatConfig.value = Number(chat)
+  }
+  if (start) {
+    void sendMessage()
+  }
 }
 function TryAgain(i: number) {
-    prompt.value = messages[i]!
-    void sendMessage()
+  prompt.value = messages[i]!
+  void sendMessage()
+}
+function getAvatar(i: number) {
+  return isMe(i) ? 'https://png.pngtree.com/png-vector/20210604/ourmid/pngtree-gray-avatar-placeholder-png-image_3416697.jpg' : 'https://www.gstatic.com/lamda/images/gemini_sparkle_4g_512_lt_f94943af3be039176192d.png'
+}
+function editChat(i: number) {
+  prompt.value = messages[i]!
+  input.value.focus()
 }
 </script>
 
 <style scoped lang="scss">
 .inputting::after {
-    content: '⬛';
-    animation: blink .75s infinite;
+  content: '⬛';
+  animation: blink .75s infinite;
 }
 
 @keyframes blink {
-    0% {
-        opacity: 1;
-    }
+  0% {
+    opacity: 1;
+  }
 
-    50% {
-        opacity: 0;
-    }
+  50% {
+    opacity: 0;
+  }
 
-    100% {
-        opacity: 1;
-    }
+  100% {
+    opacity: 1;
+  }
 }
 
 .multiline {
-    white-space: pre-line;
+  white-space: pre-line;
 }
 
 :global(pre code) {
-    white-space: pre-wrap;
-    word-break: break-word;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style>
