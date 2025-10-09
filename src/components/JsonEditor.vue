@@ -1,21 +1,30 @@
 <template>
-    <q-input :model-value="input" type="textarea" @update:model-value="onChange" :error="hasError"
-        error-message="Invalid JSON" />
+  <q-input :model-value="internalInput" type="textarea" @update:model-value="onInternalChange" :error="hasError"
+    error-message="Invalid JSON" />
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref, watch } from 'vue';
 
 const model = defineModel()
 const hasError = ref(false)
-const input = computed(() => JSON.stringify(model.value, undefined, 4))
-function onChange(value: unknown) {
-    hasError.value = false
-    try {
-        const json = JSON.parse(String(value))
-        model.value = json
-    } catch {
-        hasError.value = true
-    }
+const internalInput = ref('')
+
+watch(model, (newValue) => {
+  internalInput.value = JSON.stringify(newValue, undefined, 4);
+}, { immediate: true, deep: true });
+
+function onInternalChange(value: unknown) {
+  const stringValue = String(value);
+  internalInput.value = stringValue;
+
+  hasError.value = false;
+  try {
+    const json = JSON.parse(stringValue);
+    model.value = json;
+
+  } catch {
+    hasError.value = true;
+  }
 }
 </script>
