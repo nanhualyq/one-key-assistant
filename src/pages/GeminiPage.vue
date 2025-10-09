@@ -18,8 +18,9 @@
     </q-page-container>
     <q-footer bordered class="bg-white text-dark">
       <p>
-        <q-select v-model="currentChatConfig" :options="chatIndexList" :option-label="getChatName"
-          label="Chat Config" />
+        <q-select v-model="currentChatConfig" :options="chatIndexList" :option-label="getChatName" label="Chat Config"
+          class="inline" style="min-width: 10rem;" accesskey="c" />
+        <q-checkbox v-if="chatConfig" v-model="chatConfig.googleSearch" label="Search" accesskey="s" />
       </p>
       <q-input v-model="prompt" @keydown.ctrl.enter="prompt && sendMessage()" type="textarea" autogrow clearable
         outlined autofocus style="max-height: 80vh; overflow: auto;" accesskey="i" ref="input">
