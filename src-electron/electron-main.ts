@@ -1,9 +1,9 @@
 import { app, dialog, ipcMain, type BrowserWindow } from 'electron';
 import os from 'os';
-import createWindow from './createWindow';
+import createWindow from './main-functions/createWindow';
 import './apis/ipc'
-import './globalShortcuts'
-import './tray'
+import './main-functions/globalShortcuts'
+import './main-functions/tray'
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform();
