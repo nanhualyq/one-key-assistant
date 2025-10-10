@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lHh Lpr lFf" @keydown.ctrl.enter.capture="prompt && sendMessage()">
     <q-page-container>
       <q-page class="q-pa-md column">
         <q-chat-message v-for="(m, i) in messages" :key="i" :name="isMe(i) ? 'me' : 'Gemini'" :avatar="getAvatar(i)"
@@ -17,13 +17,13 @@
       </q-page>
     </q-page-container>
     <q-footer bordered class="bg-white text-dark">
-      <p>
+      <div>
         <q-select v-model="currentChatConfig" :options="chatIndexList" :option-label="getChatName" label="Chat Config"
           class="inline" style="min-width: 10rem;" accesskey="c" />
         <q-checkbox v-if="chatConfig" v-model="chatConfig.googleSearch" label="Search" accesskey="s" />
-      </p>
-      <q-input v-model="prompt" @keydown.ctrl.enter="prompt && sendMessage()" type="textarea" autogrow clearable
-        outlined autofocus style="max-height: 80vh; overflow: auto;" accesskey="i" ref="input">
+      </div>
+      <q-input v-model="prompt" type="textarea" autogrow clearable outlined autofocus
+        style="max-height: 80vh; overflow: auto;" accesskey="i" ref="input">
         <template #append>
           <q-btn color="primary" icon="send" @click="sendMessage" :disable="!prompt"></q-btn>
         </template>
