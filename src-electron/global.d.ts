@@ -22,6 +22,11 @@ type Tts = {
   kokoroApi: string
 }
 
+type Dict = {
+  name: string
+  url: string
+}
+
 declare global {
   interface Window {
     api: typeof api
@@ -30,5 +35,6 @@ declare global {
     actions?: Action[]
     gemini?: Gemini
     tts?: Tts
+    dict?: Dict[]
   }
 }

@@ -24,10 +24,11 @@
 <script setup lang="ts">
 import { type Gemini } from 'app/src-electron/global';
 import { cloneDeep } from 'lodash-es';
-import { inject, ref, type Ref } from 'vue';
+import { useSettingsStore } from 'src/stores/settings';
+import { computed, ref } from 'vue';
 
-const settings = inject<Ref<SettingsJson>>('settings')
-const saveSettings = inject<() => void>('saveSettings')
+const store = useSettingsStore()
+const settings = computed(() => store.json)
 const models = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite']
 
 const DEFAULT_JSON = {
@@ -37,11 +38,8 @@ const DEFAULT_JSON = {
 const json = ref<Gemini>(DEFAULT_JSON)
 onReset()
 function onSubmit() {
-  if (!settings) return
   settings.value.gemini = json.value
-  if (saveSettings) {
-    saveSettings()
-  }
+  void store.saveSettings()
 }
 function onReset() {
   json.value = cloneDeep(settings?.value.gemini || DEFAULT_JSON)

@@ -15,6 +15,10 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/settings/ActionSetting.vue')
       },
       {
+        path: 'dict',
+        component: () => import('pages/settings/DictSetting.vue')
+      },
+      {
         path: 'gemini',
         component: () => import('pages/settings/GeminiSetting.vue')
       },
@@ -23,6 +27,10 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/settings/TtsSetting.vue')
       }
     ]
+  },
+  {
+    path: '/dict',
+    component: () => import('pages/DictPage.vue')
   },
   {
     path: '/gemini',

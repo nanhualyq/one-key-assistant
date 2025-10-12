@@ -34,12 +34,13 @@
 
 <script setup lang="ts">
 import { type Chat, GoogleGenAI } from '@google/genai';
-import { computed, inject, onMounted, reactive, type Ref, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { Marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import { useRoute } from 'vue-router';
+import { useSettingsStore } from 'src/stores/settings';
 
 const marked = new Marked(
   markedHighlight({
@@ -57,7 +58,8 @@ const prompt = ref('')
 let chat: Chat
 const messages = reactive<string[]>([])
 const messageLoading = ref(false)
-const settings = inject<Ref<SettingsJson>>('settings')
+const store = useSettingsStore()
+const settings = computed(() => store.json)
 const currentChatConfig = ref(0)
 const chatIndexList = computed(() => {
   return Object.keys(settings?.value.gemini?.chats || []).map(Number)
@@ -136,7 +138,7 @@ function getChatName(index: number) {
 async function handleUrlQuery() {
   const { input_selection_text, chat, start } = route.query
   if (input_selection_text) {
-    prompt.value = await window.api.ipcRenderer.invoke('replaceTemplate', '{SELECTION_TEXT}')
+    prompt.value = await window.api.ipcRenderer.invoke('parseTemplateString', '${SELECTION_TEXT}')
   }
   if (chat) {
     currentChatConfig.value = Number(chat)

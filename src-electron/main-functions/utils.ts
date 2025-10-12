@@ -1,7 +1,7 @@
 import { clipboard } from "electron";
-import { APP_URL } from "./createWindow";
+import { APP_URL } from "../mainDir";
+import { template } from "lodash-es";
 
-export function replaceTemplate(raw: string) {
-  return raw.replaceAll('{SELECTION_TEXT}', clipboard.readText('selection'))
-    .replaceAll('{APP_URL}', APP_URL)
+export function parseTemplateString(str: string) {
+  return template(str || '')({ SELECTION_TEXT: clipboard.readText('selection'), APP_URL })
 }

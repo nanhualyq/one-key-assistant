@@ -21,6 +21,7 @@
     "lodash-es": "^4.17.21",
     "marked": "^16.3.0",
     "marked-highlight": "^2.2.2",
+    "pinia": "^3.0.3",
     "quasar": "^2.16.0",
     "vue": "3.5.20",
     "vue-router": "^4.0.12"

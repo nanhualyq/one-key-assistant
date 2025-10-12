@@ -15,8 +15,9 @@
             label="params" />
           <q-btn icon="play" label="Test" @click="testAction(action)" />
           <q-btn icon="delete" label="Delete" @click="actions.splice(index, 1)" />
-          <q-btn icon="up" label="Up" @click="swapIndex(index, -1)" :disable="index === 0" />
-          <q-btn icon="down" label="Down" @click="swapIndex(index, +1)" :disable="index === actions.length - 1" />
+          <q-btn icon="arrow_circle_up" label="Up" @click="swapIndex(index, -1)" :disable="index === 0" />
+          <q-btn icon="arrow_circle_down" label="Down" @click="swapIndex(index, +1)"
+            :disable="index === actions.length - 1" />
         </q-expansion-item>
       </q-list>
     </q-form>
@@ -27,24 +28,22 @@
 import { type Action } from 'app/src-electron/global'
 import { cloneDeep } from 'lodash-es'
 import JsonEditor from 'src/components/JsonEditor.vue'
-import { inject, type Ref, ref, toRaw } from 'vue'
+import { useSettingsStore } from 'src/stores/settings'
+import { computed, ref, toRaw } from 'vue'
 
-const settings = inject<Ref<SettingsJson>>('settings')
+const store = useSettingsStore()
+const settings = computed(() => store.json)
 
 const actions = ref<Action[]>([])
 onReset()
-const saveSettings = inject<() => void>('saveSettings')
 
 function testAction(action: Action) {
   window.api.ipcRenderer.send(action.function, toRaw(action.params))
 }
-function onSubmit() {
-  if (!settings) return
+async function onSubmit() {
   settings.value.actions = actions.value
-  if (saveSettings) {
-    saveSettings()
-    window.api.ipcRenderer.send('resetActionsShortcut')
-  }
+  await store.saveSettings()
+  window.api.ipcRenderer.send('resetActionsShortcut')
 }
 function onReset() {
   actions.value = cloneDeep(settings?.value.actions) || []

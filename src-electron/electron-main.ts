@@ -1,5 +1,6 @@
 import { app, dialog, ipcMain, type BrowserWindow } from 'electron';
 import os from 'os';
+import { APP_URL } from './mainDir';
 import createWindow from './main-functions/createWindow';
 import './apis/ipc'
 import './main-functions/globalShortcuts'
@@ -18,7 +19,7 @@ async function createMainWindow() {
     width: 1000,
     height: 600,
     useContentSize: true,
-    url: '{APP_URL}'
+    url: APP_URL
   });
 
   mainWindow.on('closed', () => {
