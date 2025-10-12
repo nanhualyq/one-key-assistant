@@ -34,7 +34,7 @@ export default class DictTabsWindow extends BaseWindow {
     const topView = new WebContentsView({
       webPreferences: getWebPreferences()
     })
-    void topView.webContents.loadURL(`${APP_URL}/#/dict`)
+    void topView.webContents.loadURL(`${APP_URL}#/dict`)
     this.contentView.addChildView(topView)
 
     const bottomView = new WebContentsView()
