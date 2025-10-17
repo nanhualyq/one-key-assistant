@@ -6,12 +6,16 @@
           :sent="isMe(i)" :class="{ 'self-end': isMe(i) }" bg-color="grey-1">
           <div v-if="isMe(i)" class="multiline">
             {{ m }}
-            <q-toolbar>
+          </div>
+          <div v-else v-scroll @click.capture="handlePreToolsClick($event)"
+            :class="{ inputting: isInputting(i), 'chat-response': i === messages.length - 1 }" v-html="marked.parse(m)">
+          </div>
+          <div>
+            <template v-if="isMe(i)">
               <q-btn size="sm" flat round dense icon="sync" title="Try again" @click="TryAgain(i)" />
               <q-btn size="sm" flat round dense icon="edit" title="Edit" @click="editChat(i)" />
-            </q-toolbar>
-          </div>
-          <div v-else v-scroll :class="{ inputting: isInputting(i) }" v-html="marked.parse(m)">
+            </template>
+            <q-btn size="sm" flat round dense icon="copy_all" title="Copy" @click="copyChat(i)" />
           </div>
         </q-chat-message>
       </q-page>
@@ -22,8 +26,8 @@
           class="inline" style="min-width: 10rem;" accesskey="c" />
         <q-checkbox v-if="chatConfig" v-model="chatConfig.googleSearch" label="Search" accesskey="s" />
       </div>
-      <q-input v-model="prompt" type="textarea" autogrow clearable outlined autofocus
-        style="max-height: 80vh; overflow: auto;" accesskey="i" ref="input">
+      <q-input v-model="prompt" type="textarea" clearable outlined autofocus style="max-height: 80vh; overflow: auto;"
+        accesskey="i" ref="input">
         <template #append>
           <q-btn color="primary" icon="send" @click="sendMessage" :disable="!prompt"></q-btn>
         </template>
@@ -34,7 +38,7 @@
 
 <script setup lang="ts">
 import { type Chat, GoogleGenAI } from '@google/genai';
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { Marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
 import hljs from 'highlight.js';
@@ -124,6 +128,14 @@ async function sendMessage() {
   for await (const chunk of res) {
     messages[messages.length - 1] += chunk.text || ''
   }
+  void nextTick(addPreTools)
+}
+
+function addPreTools() {
+  document.querySelectorAll('.chat-response pre').forEach(pre => {
+    const html = `<div style="margin: -12px 0 8px 0;"><button>Copy</button></div>`
+    pre.insertAdjacentHTML('afterend', html)
+  })
 }
 
 function isMe(i: number) {
@@ -157,6 +169,22 @@ function getAvatar(i: number) {
 function editChat(i: number) {
   prompt.value = messages[i]!
   input.value.focus()
+}
+function copyChat(i: number) {
+  const text = messages[i]!
+  void navigator.clipboard.writeText(text)
+}
+function handlePreToolsClick(e: MouseEvent) {
+  e.preventDefault()
+  e.stopPropagation()
+  const el = e.target
+  if (!(el instanceof HTMLElement)) {
+    return
+  }
+  if (el.textContent === 'Copy') {
+    const text = el.closest('pre')?.querySelector('code')?.innerText
+    void navigator.clipboard.writeText(text || '')
+  }
 }
 </script>
 
