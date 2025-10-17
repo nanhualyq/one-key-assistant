@@ -26,8 +26,8 @@
           class="inline" style="min-width: 10rem;" accesskey="c" />
         <q-checkbox v-if="chatConfig" v-model="chatConfig.googleSearch" label="Search" accesskey="s" />
       </div>
-      <q-input v-model="prompt" type="textarea" clearable outlined autofocus style="max-height: 80vh; overflow: auto;"
-        accesskey="i" ref="input">
+      <q-input v-model="prompt" type="textarea" clearable outlined autofocus autogrow
+        style="max-height: 80vh; overflow: auto;" accesskey="i" ref="input">
         <template #append>
           <q-btn color="primary" icon="send" @click="sendMessage" :disable="!prompt"></q-btn>
         </template>
@@ -182,7 +182,7 @@ function handlePreToolsClick(e: MouseEvent) {
     return
   }
   if (el.textContent === 'Copy') {
-    const text = el.closest('pre')?.querySelector('code')?.innerText
+    const text = el.closest('div')?.previousElementSibling?.textContent
     void navigator.clipboard.writeText(text || '')
   }
 }
