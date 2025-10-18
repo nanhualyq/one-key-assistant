@@ -21,10 +21,14 @@
       </q-page>
     </q-page-container>
     <q-footer bordered class="bg-white text-dark">
-      <div>
+      <div class="q-gutter-x-md">
         <q-select v-model="currentChatConfig" :options="chatIndexList" :option-label="getChatName" label="Chat Config"
           class="inline" style="min-width: 10rem;" accesskey="c" />
         <q-checkbox v-if="chatConfig" v-model="chatConfig.googleSearch" label="Search" accesskey="s" />
+        <q-checkbox v-if="chatConfig" v-model="chatConfig.thinkingBudget" label="Thinking" accesskey="t"
+          :true-value="-1" :false-value="0" />
+        <q-select class="inline" v-if="chatConfig" v-model="chatConfig.model" :options="models" label="model"
+          accesskey="m" />
       </div>
       <q-input v-model="prompt" type="textarea" clearable outlined autofocus autogrow
         style="max-height: 80vh; overflow: auto;" accesskey="i" ref="input">
@@ -45,6 +49,7 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import { useRoute } from 'vue-router';
 import { useSettingsStore } from 'src/stores/settings';
+import { models } from 'src/data/gemini';
 
 const marked = new Marked(
   markedHighlight({
@@ -76,6 +81,10 @@ watch(currentChatConfig, newChat)
 const chatConfig = computed(() => {
   return settings?.value.gemini?.chats?.[currentChatConfig.value]
 })
+watch(
+  () => chatConfig.value?.model,
+  newChat
+)
 
 // 回答时自动滚动到输出位置
 const vScroll = {
@@ -110,13 +119,17 @@ async function sendMessage() {
       googleSearch: {}
     })
   }
+  let thinkingBudget = -1
+  if (chatConfig.value?.model !== 'gemini-2.5-pro') {
+    thinkingBudget = chatConfig.value?.thinkingBudget ?? 0
+  }
   const res = await chat
     .sendMessageStream({
       message: input!,
       config: {
         tools,
         thinkingConfig: {
-          thinkingBudget: chatConfig.value?.thinkingBudget ?? 0
+          thinkingBudget
         },
         systemInstruction: chatConfig.value?.systemInstruction || ''
       }

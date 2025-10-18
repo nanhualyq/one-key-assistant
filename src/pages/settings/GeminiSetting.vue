@@ -24,12 +24,12 @@
 <script setup lang="ts">
 import { type Gemini } from 'app/src-electron/global';
 import { cloneDeep } from 'lodash-es';
+import { models } from 'src/data/gemini';
 import { useSettingsStore } from 'src/stores/settings';
 import { computed, ref } from 'vue';
 
 const store = useSettingsStore()
 const settings = computed(() => store.json)
-const models = ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite']
 
 const DEFAULT_JSON = {
   apiKey: '',
