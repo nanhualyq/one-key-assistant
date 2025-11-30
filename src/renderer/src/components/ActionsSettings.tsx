@@ -1,8 +1,10 @@
 import { Button, notification, Space } from 'antd'
-import { Action, createAction, useSettings } from './SettingsProvider'
 import { useEffect, useReducer, useState } from 'react'
 import ActionEditDialog from './ActionEditDialog'
 import { createSlice } from '@reduxjs/toolkit'
+import useSettings from '@renderer/hooks/useSettings'
+import { useAppSelector } from '@renderer/hooks/useRedux'
+import { Action, createAction } from '@renderer/store/settings.slice'
 
 const slice = createSlice({
   name: 'actions',
@@ -24,7 +26,8 @@ const slice = createSlice({
 })
 
 function ActionsSettins(): React.JSX.Element {
-  const { settings, saveSettings } = useSettings()
+  const { saveSettings } = useSettings()
+  const settings = useAppSelector((state) => state.settings)
 
   const [actions, dispatch] = useReducer(slice.reducer, settings.actions)
 

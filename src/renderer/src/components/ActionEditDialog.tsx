@@ -1,7 +1,7 @@
 import { Button, Flex, Form, Input, Modal, Select } from 'antd'
-import { Action, actionSchema, actionTypes } from './SettingsProvider'
 import JsonEditor from './JsonEditor'
 import z from 'zod'
+import { Action, actionSchema, actionTypes } from '@renderer/store/settings.slice'
 
 interface Props {
   action: Action

@@ -1,18 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
-import SettingsPage from './pages/SettingsPage'
-import { SettingsProvider } from './components/SettingsProvider'
+import { Provider } from 'react-redux'
+import store from './store'
+import App from './App'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <SettingsProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/settings" replace />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Routes>
-      </BrowserRouter>
-    </SettingsProvider>
+    <Provider store={store}>
+      <App />
+    </Provider>
   </StrictMode>
 )

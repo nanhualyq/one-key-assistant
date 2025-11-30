@@ -42,8 +42,9 @@ function createWindow(): void {
 app.whenReady().then(async () => {
   if (import.meta.env.DEV) {
     await import('electron-devtools-installer').then(
-      ({ default: installExtension, REACT_DEVELOPER_TOOLS }) => {
+      ({ default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS }) => {
         installExtension(REACT_DEVELOPER_TOOLS)
+        installExtension(REDUX_DEVTOOLS)
       }
     )
   }
