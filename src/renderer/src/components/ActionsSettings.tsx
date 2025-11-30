@@ -2,41 +2,50 @@ import { Button, notification, Space } from 'antd'
 import { Action, createAction, useSettings } from './SettingsProvider'
 import { useEffect, useReducer, useState } from 'react'
 import ActionEditDialog from './ActionEditDialog'
+import { createSlice } from '@reduxjs/toolkit'
+
+const slice = createSlice({
+  name: 'actions',
+  initialState: [] as Action[],
+  reducers: {
+    add(state) {
+      state.push(createAction())
+    },
+    delete(state, action) {
+      state.splice(action.payload, 1)
+    },
+    save(state, action) {
+      state[action.payload.index] = action.payload.item
+    },
+    init(_state, action) {
+      return action.payload
+    }
+  }
+})
 
 function ActionsSettins(): React.JSX.Element {
   const { settings, saveSettings } = useSettings()
 
-  const [actions, dispatchActions] = useReducer((state, action): typeof settings.actions => {
-    if (action.type === 'add') {
-      return [...state, createAction()]
-    } else if (action.type === 'delete') {
-      return state.filter((_, index) => index !== action.index)
-    } else if (action.type === 'save') {
-      return state.map((item, index) => (index === action.index ? action.item : item))
-    } else if (action.type === 'init') {
-      return action.actions
-    }
-    return state
-  }, settings.actions)
+  const [actions, dispatch] = useReducer(slice.reducer, settings.actions)
 
   useEffect(() => {
-    dispatchActions({ type: 'init', actions: settings.actions })
+    dispatch(slice.actions.init(settings.actions))
   }, [settings.actions])
 
   const [editIndex, setEditIndex] = useState(-1)
 
   function deleteAction(): void {
-    dispatchActions({ type: 'delete', index: editIndex })
+    dispatch(slice.actions.delete(editIndex))
     closeDialog()
   }
 
   function saveAction(action: Action): void {
-    dispatchActions({ type: 'save', item: action, index: editIndex })
+    dispatch(slice.actions.save({ index: editIndex, item: action }))
     closeDialog()
   }
 
   function saveActions(): void {
-    saveSettings({ ...settings, actions })
+    saveSettings({ ...settings, actions: actions })
     notification.success({ title: 'Actions saved' })
   }
 
@@ -54,7 +63,7 @@ function ActionsSettins(): React.JSX.Element {
         ))}
       </ul>
       <Space>
-        <Button onClick={() => dispatchActions({ type: 'add' })}>+ Add</Button>
+        <Button onClick={() => dispatch(slice.actions.add())}>+ Add</Button>
         <Button type="primary" onClick={saveActions}>
           Save
         </Button>
