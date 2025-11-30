@@ -23,6 +23,9 @@ function ActionEditDialog(props: Props): React.JSX.Element {
     </Flex>
   )
   async function checkShortcut(_rule, value): Promise<void> {
+    if (!value) {
+      return
+    }
     const res = await window.electron.ipcRenderer.invoke(
       'main',
       'globalShortcut.isRegistered',
