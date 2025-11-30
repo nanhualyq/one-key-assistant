@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-// import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
+import './ipc.api'
 
 function createWindow(): void {
   // Create the browser window.
